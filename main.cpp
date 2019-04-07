@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "lambertian.h"
 #include "metal.h"
+#include "dielectric.h"
 #include "utils.h"
 
 
@@ -30,13 +31,23 @@ int main() {
   int ny = 100;
   int ns = 100;
   std::cout << "P3\n" << nx << " " << ny << "\n255\n";
-  hitable *list[4];
-  list[0] = new sphere(vec3(0, 0, -1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)));
+  hitable *list[5];
+  list[0] = new sphere(vec3(0, 0, -1), 0.5, new lambertian(vec3(0.1, 0.2, 0.5)));
   list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
-  list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 1.0));
-  list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.3));
-  hitable *world = new hitable_list(list, 4);
-  camera cam;
+  list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 0.3));
+  list[3] = new sphere(vec3(-1, 0, -1), 0.5, new dielectric(1.5));
+  list[4] = new sphere(vec3(-1, 0, -1), -0.45, new dielectric(1.5));
+  hitable *world = new hitable_list(list, 5);
+  // hitable *list[2];
+  // float R = cos(M_PI/4);
+  // list[0] = new sphere(vec3(-R, 0, -1), R, new lambertian(vec3(0, 0, 1)));
+  // list[1] = new sphere(vec3(R, 0, -1), R, new lambertian(vec3(1, 0, 0)));
+  // hitable *world = new hitable_list(list, 2);
+  vec3 lookfrom(3,3,2);
+  vec3 lookat(0,0,-1);
+  float dist_to_focus = (lookfrom - lookat).length();
+  float aperture = 2.0;
+  camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
   for (int j = ny-1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
       vec3 col(0, 0, 0);
